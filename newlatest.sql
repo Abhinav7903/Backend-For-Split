@@ -1,4 +1,4 @@
--- Create the 'users' table
+--- Create the 'users' table
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     email VARCHAR(255) UNIQUE,
