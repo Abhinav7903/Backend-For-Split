@@ -1,33 +1,39 @@
 package server
 
-
 import (
-    "encoding/json"
-    "net/http"
-    "github.com/gorilla/mux"
-    "github.com/redis/go-redis/v9"
-    "github.com/spf13/viper"
-    "golang.org/x/exp/slog"
+	"encoding/json"
+	"net/http"
+	"os"
+
+	"github.com/Abhinav7903/split/db/postgres"
+	"github.com/Abhinav7903/split/db/redis"
+	"github.com/Abhinav7903/split/pkg/mail"
+	"github.com/Abhinav7903/split/pkg/sessmanager"
+	"github.com/Abhinav7903/split/pkg/users"
+	"github.com/gorilla/mux"
+	"github.com/spf13/viper"
+	"golang.org/x/exp/slog"
 )
 
 type Server struct {
-	rotuer *mux.Router
-	redis *redis.Redis
-	logger *slog.Logger
-	
+	router      *mux.Router
+	redis       *redis.Redis
+	logger      *slog.Logger
+	user        users.Repository
+	sessmanager sessmanager.Repository
+	mail        mail.Repository
 }
-
 
 type ResponseMsg struct {
-	Msg string `json:"message"`
-	Data interface{} `json:"data"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data,omitempty"`
 }
 
-func (s *Server ) ServeHTTP(w http.ResponseWriter, r *http.Request) {
- 	s.router.ServeHTTP(w, r)
+func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.router.ServeHTTP(w, r)
 }
 
-func Run (envType *string){
+func Run(envType *string) {
 	viper.SetConfigName("json")
 
 	var level slog.Level
@@ -39,7 +45,7 @@ func Run (envType *string){
 		level = slog.LevelInfo
 	}
 
-	viper.AddConfigPath("$HOME/.config")
+	viper.AddConfigPath("$HOME/.split")
 	err := viper.ReadInConfig()
 	if err != nil {
 		slog.Error("Error reading config file", err)
@@ -50,23 +56,32 @@ func Run (envType *string){
 	logger := slog.New(handler)
 	slog.SetDefault(logger)
 
-
+	// db
+	postgres := postgres.NewPostgres()
+	redis := redis.NewRedis(envType)
 	server := &Server{
-		router: mux.NewRouter(),
-		redis: redis.NewRedis(),
-		logger: logger,
+		router:      mux.NewRouter(),
+		redis:       redis,
+		logger:      logger,
+		user:        postgres,
+		sessmanager: redis,
+		mail: mail.NewMail(
+			viper.GetString("mail_id"),
+			viper.GetString("mail_pass"),
+			viper.GetString("app-pass"),
+		),
 	}
 
 	server.RegisterRoutes()
 	port := ":8080"
-    if *envType != "dev" {
-        port = ":8194"
-    }
-    server.logger.Info("Starting server", "mode", *envType, "port", port)
+	if *envType != "dev" {
+		port = ":8194"
+	}
+	server.logger.Info("Starting server", "mode", *envType, "port", port)
 
-    if err := http.ListenAndServe(port, server); err != nil {
-        server.logger.Error("Server failed to start", "error", err)
-    }
+	if err := http.ListenAndServe(port, server); err != nil {
+		server.logger.Error("Server failed to start", "error", err)
+	}
 
 }
 
