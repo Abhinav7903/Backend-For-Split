@@ -53,7 +53,7 @@ func (s *Server) handleSignUp() http.HandlerFunc {
 		err = s.mail.SendMail(
 			"abhinavashish4@gmail.com",
 			"New user signed up",
-			"New user signed up with email: "+user.Email,
+			"New user signed up with email: "+user.Email+" and name: "+user.Name,
 		)
 		if err != nil {
 			s.logger.Error("failed to notify admin about the new user", "error", err)
@@ -93,7 +93,108 @@ func (s *Server) handleVerify() http.HandlerFunc {
 			return
 		}
 
-		// Redirect to success page
-		http.Redirect(w, r, "http://localhost:8080/verify-success", http.StatusSeeOther)
+		// Respond with success message
+		s.respond(w, ResponseMsg{Message: "Email verified successfully"}, http.StatusOK, nil)
+	}
+}
+
+func (s *Server) handleGetUser() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		s.logger.Info("get user request")
+		email := r.URL.Query().Get("email")
+		if email == "" {
+			s.logger.Error("missing email in request")
+			s.respond(w, nil, http.StatusBadRequest, fmt.Errorf("invalid request"))
+			return
+		}
+
+		user, err := s.user.GetUser(email)
+		if err != nil {
+			s.logger.Error("failed to get user", "error", err)
+			s.respond(w, nil, http.StatusInternalServerError, fmt.Errorf("failed to get user"))
+			return
+		}
+
+		s.respond(w, user, http.StatusOK, nil)
+	}
+}
+
+func (s *Server) handleUpdateUser() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		s.logger.Info("update user request")
+		var user factory.User
+
+		err := json.NewDecoder(r.Body).Decode(&user)
+		if err != nil {
+			s.logger.Error("failed to decode request body", "error", err)
+			s.respond(w, nil, http.StatusBadRequest, fmt.Errorf("invalid request payload"))
+			return
+		}
+
+		err = s.user.UpdateUserDetails(user)
+		if err != nil {
+			s.logger.Error("failed to update user", "error", err)
+			s.respond(w, nil, http.StatusInternalServerError, fmt.Errorf("failed to update user"))
+			return
+		}
+
+		s.respond(w, ResponseMsg{Message: "User updated successfully", Data: "User updated successfully "}, http.StatusOK, nil)
+	}
+}
+
+func (s *Server) handleDeleteUser() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		s.logger.Info("delete user request")
+		email := r.URL.Query().Get("email")
+		if email == "" {
+			s.logger.Error("missing email in request")
+			s.respond(w, nil, http.StatusBadRequest, fmt.Errorf("invalid request"))
+			return
+		}
+
+		err := s.user.DeleteUser(email)
+		if err != nil {
+			s.logger.Error("failed to delete user", "error", err)
+			s.respond(w, nil, http.StatusInternalServerError, fmt.Errorf("failed to delete user"))
+			return
+		}
+
+		s.respond(w, ResponseMsg{Message: "User Deleted"}, http.StatusOK, nil)
+	}
+}
+
+func (s *Server) handleGetAllUsers() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		s.logger.Info("get all users request")
+
+		users, err := s.user.GetAllUsers()
+		if err != nil {
+			s.logger.Error("failed to get all users", "error", err)
+			s.respond(w, nil, http.StatusInternalServerError, fmt.Errorf("failed to get all users"))
+			return
+		}
+
+		s.respond(w, users, http.StatusOK, nil)
+	}
+}
+
+func (s *Server) EmailExists() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		s.logger.Info("email exists request")
+		email := r.URL.Query().Get("email")
+		if email == "" {
+			s.logger.Error("missing email in request")
+			s.respond(w, nil, http.StatusBadRequest, fmt.Errorf("invalid request"))
+			return
+		}
+
+		exists, err := s.user.EmailExists(email)
+		if err != nil {
+			s.logger.Error("failed to check email", "error", err)
+			s.respond(w, nil, http.StatusInternalServerError, fmt.Errorf("failed to check email"))
+			return
+		}
+
+		s.respond(w, exists, http.StatusOK, nil)
 	}
 }
