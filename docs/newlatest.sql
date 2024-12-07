@@ -4,7 +4,8 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE,
     firebase_id VARCHAR(255) UNIQUE,
     name VARCHAR(100),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    verified boolean DEFAULT false NOT NULL
 );
 
 -- Create the 'groups' table
