@@ -7,6 +7,7 @@ import (
 
 	"github.com/Abhinav7903/split/db/postgres"
 	"github.com/Abhinav7903/split/db/redis"
+	"github.com/Abhinav7903/split/pkg/groups"
 	"github.com/Abhinav7903/split/pkg/mail"
 	"github.com/Abhinav7903/split/pkg/sessmanager"
 	"github.com/Abhinav7903/split/pkg/users"
@@ -22,6 +23,7 @@ type Server struct {
 	user        users.Repository
 	sessmanager sessmanager.Repository
 	mail        mail.Repository
+	group       groups.Repository
 }
 
 type ResponseMsg struct {
@@ -70,6 +72,7 @@ func Run(envType *string) {
 			viper.GetString("mail_pass"),
 			viper.GetString("app-pass"),
 		),
+		group: postgres,
 	}
 
 	server.RegisterRoutes()
