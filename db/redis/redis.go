@@ -29,7 +29,7 @@ func initialize(envType *string) *redis.Client {
 		})
 	} else {
 		rdb = redis.NewClient(&redis.Options{
-			Addr: "redis:6379",
+			Addr: "localhost:6379",
 			DB:   0,
 		})
 	}
