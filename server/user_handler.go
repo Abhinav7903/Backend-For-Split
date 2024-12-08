@@ -138,7 +138,7 @@ func (s *Server) handleUpdateUser() http.HandlerFunc {
 			return
 		}
 
-		s.respond(w, ResponseMsg{Message: "User updated successfully", Data: "User updated successfully "}, http.StatusOK, nil)
+		s.respond(w, ResponseMsg{Message: "User updated successfully"}, http.StatusOK, nil)
 	}
 }
 
