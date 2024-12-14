@@ -68,7 +68,6 @@ func (p *Postgres) AddGroupMember(groupMember factory.GroupMember) (int, error) 
 }
 
 // GetGroupMemberByID returns the group member with the given ID
-// GetGroupMemberByID returns the group member with the given ID
 func (p *Postgres) GetGroupMemberByID(groupMemberID int) (*factory.GroupMember, error) {
 	// Validate input
 	if groupMemberID <= 0 {
@@ -127,4 +126,105 @@ func (p *Postgres) GetGroupMembersByGroupID(groupID int) ([]factory.GroupMember,
 	}
 
 	return groupMembers, nil
+}
+
+func (p *Postgres) RemoveUserFromGroupByCreator(groupID, userID, creatorID int) error {
+	// Validate input
+	if groupID <= 0 || userID <= 0 || creatorID <= 0 {
+		return errors.New("invalid input: groupID, userID, and creatorID must be greater than zero")
+	}
+
+	// Check if the user is part of the group
+	var isMember bool
+	const checkUserInGroupQuery = `
+		SELECT EXISTS (
+			SELECT 1 FROM group_members
+			WHERE group_id = $1 AND user_id = $2
+		)
+	`
+	err := p.dbConn.QueryRow(checkUserInGroupQuery, groupID, userID).Scan(&isMember)
+	if err != nil {
+		return fmt.Errorf("failed to check if user is part of the group: %w", err)
+	}
+	if !isMember {
+		return errors.New("user is not a member of the group")
+	}
+
+	// Check if the user is the creator of the group
+	var createdBy int
+	const checkCreatorQuery = `
+        SELECT created_by 
+        FROM groups
+        WHERE group_id = $1
+    `
+	err = p.dbConn.QueryRow(checkCreatorQuery, groupID).Scan(&createdBy)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return errors.New("group not found")
+		}
+		return fmt.Errorf("failed to check group creator: %w", err)
+	}
+
+	// Ensure the creator is the one making the request
+	if createdBy != creatorID {
+		return errors.New("only the group creator can remove users from the group")
+	}
+
+	// Remove the user from the group
+	const removeUserQuery = `
+        DELETE FROM group_members
+        WHERE group_id = $1 AND user_id = $2
+    `
+	result, err := p.dbConn.Exec(removeUserQuery, groupID, userID)
+	if err != nil {
+		return fmt.Errorf("failed to remove user from group: %w", err)
+	}
+
+	// Check if a row was actually deleted
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check affected rows: %w", err)
+	}
+	if rowsAffected == 0 {
+		return errors.New("user was not removed, possibly not a member of the group")
+	}
+
+	return nil
+}
+
+// RemoveUserSelf removes the user from the group they belong to
+func (p *Postgres) RemoveUserSelf(groupID, userID int) error {
+	// Validate input
+	if groupID <= 0 || userID <= 0 {
+		return errors.New("invalid input")
+	}
+
+	// Check if the user is part of the group
+	var exists bool
+	const checkUserInGroupQuery = `
+        SELECT EXISTS (
+            SELECT 1 FROM group_members
+            WHERE group_id = $1 AND user_id = $2
+        )
+    `
+	err := p.dbConn.QueryRow(checkUserInGroupQuery, groupID, userID).Scan(&exists)
+	if err != nil {
+		return fmt.Errorf("failed to check if user is part of the group: %w", err)
+	}
+
+	if !exists {
+		return errors.New("user is not a member of the group")
+	}
+
+	// Remove the user from the group
+	const removeUserQuery = `
+        DELETE FROM group_members
+        WHERE group_id = $1 AND user_id = $2
+    `
+	_, err = p.dbConn.Exec(removeUserQuery, groupID, userID)
+	if err != nil {
+		return fmt.Errorf("failed to remove user from group: %w", err)
+	}
+
+	return nil
 }

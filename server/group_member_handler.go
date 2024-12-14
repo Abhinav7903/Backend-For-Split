@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -118,5 +119,94 @@ func (s *Server) handleGetGroupMembersByGroupID() http.HandlerFunc {
 			Message: "Group members retrieved successfully",
 			Data:    groupMembers,
 		}, http.StatusOK, nil)
+	}
+}
+
+func (s *Server) handleRemoveUserFromGroupByCreator() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Ensure the HTTP method is DELETE
+		if r.Method != http.MethodDelete {
+			s.respond(w, ResponseMsg{Message: "Method not allowed"}, http.StatusMethodNotAllowed, nil)
+			return
+		}
+
+		// Get group ID, user ID, and creator ID from URL params or request body
+		groupIDStr := r.URL.Query().Get("group_id")
+		userIDStr := r.URL.Query().Get("user_id")
+		creatorIDStr := r.URL.Query().Get("creator_id")
+
+		if groupIDStr == "" || userIDStr == "" || creatorIDStr == "" {
+			s.respond(w, ResponseMsg{Message: "Missing required parameters"}, http.StatusBadRequest, nil)
+			return
+		}
+
+		groupID, err := strconv.Atoi(groupIDStr)
+		if err != nil {
+			s.respond(w, ResponseMsg{Message: "Invalid group ID"}, http.StatusBadRequest, nil)
+			return
+		}
+
+		userID, err := strconv.Atoi(userIDStr)
+		if err != nil {
+			s.respond(w, ResponseMsg{Message: "Invalid user ID"}, http.StatusBadRequest, nil)
+			return
+		}
+
+		creatorID, err := strconv.Atoi(creatorIDStr)
+		if err != nil {
+			s.respond(w, ResponseMsg{Message: "Invalid creator ID"}, http.StatusBadRequest, nil)
+			return
+		}
+
+		// Remove user from the group by the group creator
+		err = s.group_members.RemoveUserFromGroupByCreator(groupID, userID, creatorID)
+		if err != nil {
+			s.respond(w, ResponseMsg{Message: fmt.Sprintf("Failed to remove user from group: %v", err)}, http.StatusInternalServerError, nil)
+			return
+		}
+
+		// Respond with success message
+		s.respond(w, ResponseMsg{Message: "User removed from group successfully"}, http.StatusOK, nil)
+	}
+}
+
+func (s *Server) handleRemoveUserSelfFromGroup() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Ensure the HTTP method is DELETE
+		if r.Method != http.MethodDelete {
+			s.respond(w, ResponseMsg{Message: "Method not allowed"}, http.StatusMethodNotAllowed, nil)
+			return
+		}
+
+		// Get group ID and user ID from URL params or request body
+		groupIDStr := r.URL.Query().Get("group_id")
+		userIDStr := r.URL.Query().Get("user_id")
+
+		if groupIDStr == "" || userIDStr == "" {
+			s.respond(w, ResponseMsg{Message: "Missing required parameters"}, http.StatusBadRequest, nil)
+			return
+		}
+
+		groupID, err := strconv.Atoi(groupIDStr)
+		if err != nil {
+			s.respond(w, ResponseMsg{Message: "Invalid group ID"}, http.StatusBadRequest, nil)
+			return
+		}
+
+		userID, err := strconv.Atoi(userIDStr)
+		if err != nil {
+			s.respond(w, ResponseMsg{Message: "Invalid user ID"}, http.StatusBadRequest, nil)
+			return
+		}
+
+		// Remove the user from the group
+		err = s.group_members.RemoveUserSelf(groupID, userID)
+		if err != nil {
+			s.respond(w, ResponseMsg{Message: fmt.Sprintf("Failed to remove user from group: %v", err)}, http.StatusInternalServerError, nil)
+			return
+		}
+
+		// Respond with success message
+		s.respond(w, ResponseMsg{Message: "User removed from group successfully"}, http.StatusOK, nil)
 	}
 }

@@ -94,7 +94,17 @@ func (s *Server) RegisterRoutes() {
 		s.handleGetGroupMembersByGroupID(),
 	).Methods(http.MethodGet, http.MethodOptions)
 
-	// Update a group member...
+	//remove group member by creator
+	s.router.HandleFunc(
+		"/remove-group-member",
+		s.handleRemoveUserFromGroupByCreator(),
+	).Methods(http.MethodDelete, http.MethodOptions)
+
+	//self remove
+	s.router.HandleFunc(
+		"/remove-group-member-self",
+		s.handleRemoveUserSelfFromGroup(),
+	).Methods(http.MethodDelete, http.MethodOptions)
 
 }
 func (s *Server) HandlePong() http.HandlerFunc {
