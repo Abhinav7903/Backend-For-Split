@@ -76,6 +76,26 @@ func (s *Server) RegisterRoutes() {
 		s.handlerGroupExists(),
 	).Methods(http.MethodGet, http.MethodOptions)
 
+	// Add a group member
+	s.router.HandleFunc(
+		"/add-group-member",
+		s.handleAddGroupMember(),
+	).Methods(http.MethodPost, http.MethodOptions)
+
+	// Get a single group member by ID
+	s.router.HandleFunc(
+		"/get-group-member",
+		s.handleGetGroupMember(),
+	).Methods(http.MethodGet, http.MethodOptions)
+
+	// Get all group members in a group
+	s.router.HandleFunc(
+		"/get-group-members-by-group-id",
+		s.handleGetGroupMembersByGroupID(),
+	).Methods(http.MethodGet, http.MethodOptions)
+
+	// Update a group member...
+
 }
 func (s *Server) HandlePong() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
