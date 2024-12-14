@@ -40,7 +40,7 @@ func (p *Postgres) AddGroupMember(groupMember factory.GroupMember) (int, error) 
 	var groupExists, userExists bool
 	err = tx.QueryRow(checkExistsQuery, groupMember.GroupID, groupMember.UserID).Scan(&groupExists, &userExists)
 	if err != nil {
-		slog.Error("failed to check existence of group and user", err)
+		slog.Error("failed to check existence of group and user", "error", err)
 		return 0, fmt.Errorf("failed to check existence of group and user: %w", err)
 	}
 	if !groupExists {
