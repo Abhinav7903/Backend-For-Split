@@ -11,6 +11,7 @@ import (
 	"github.com/Abhinav7903/split/pkg/groups"
 	"github.com/Abhinav7903/split/pkg/mail"
 	"github.com/Abhinav7903/split/pkg/sessmanager"
+	"github.com/Abhinav7903/split/pkg/transaction"
 	"github.com/Abhinav7903/split/pkg/users"
 	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
@@ -26,6 +27,7 @@ type Server struct {
 	mail          mail.Repository
 	group         groups.Repository
 	group_members groupmember.Repository
+	transaction   transaction.Repository
 }
 
 type ResponseMsg struct {
@@ -76,6 +78,7 @@ func Run(envType *string) {
 		),
 		group:         postgres,
 		group_members: postgres,
+		transaction:   postgres,
 	}
 
 	server.RegisterRoutes()
