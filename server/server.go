@@ -12,6 +12,7 @@ import (
 	"github.com/Abhinav7903/split/pkg/mail"
 	"github.com/Abhinav7903/split/pkg/sessmanager"
 	"github.com/Abhinav7903/split/pkg/transaction"
+	transactionsplit "github.com/Abhinav7903/split/pkg/transaction_split"
 	"github.com/Abhinav7903/split/pkg/users"
 	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
@@ -19,15 +20,16 @@ import (
 )
 
 type Server struct {
-	router        *mux.Router
-	redis         *redis.Redis
-	logger        *slog.Logger
-	user          users.Repository
-	sessmanager   sessmanager.Repository
-	mail          mail.Repository
-	group         groups.Repository
-	group_members groupmember.Repository
-	transaction   transaction.Repository
+	router           *mux.Router
+	redis            *redis.Redis
+	logger           *slog.Logger
+	user             users.Repository
+	sessmanager      sessmanager.Repository
+	mail             mail.Repository
+	group            groups.Repository
+	group_members    groupmember.Repository
+	transaction      transaction.Repository
+	transactionsplit transactionsplit.Repository
 }
 
 type ResponseMsg struct {
@@ -76,9 +78,10 @@ func Run(envType *string) {
 			viper.GetString("mail_pass"),
 			viper.GetString("app-pass"),
 		),
-		group:         postgres,
-		group_members: postgres,
-		transaction:   postgres,
+		group:            postgres,
+		group_members:    postgres,
+		transaction:      postgres,
+		transactionsplit: postgres,
 	}
 
 	server.RegisterRoutes()

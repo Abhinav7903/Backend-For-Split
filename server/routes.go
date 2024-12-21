@@ -106,6 +106,58 @@ func (s *Server) RegisterRoutes() {
 		s.handleRemoveUserSelfFromGroup(),
 	).Methods(http.MethodDelete, http.MethodOptions)
 
+	// Create transaction
+	s.router.HandleFunc(
+		"/create-transaction",
+		s.handleCreateTransaction(),
+	).Methods(http.MethodPost, http.MethodOptions)
+
+	// Get transaction by ID
+	s.router.HandleFunc(
+		"/get-transaction",
+		s.handleGetTransactionByID(),
+	).Methods(http.MethodGet, http.MethodOptions)
+
+	// Get transactions by lender ID
+	s.router.HandleFunc(
+		"/get-transactions-by-lender",
+		s.handleGetTransactionsByLenderID(),
+	).Methods(http.MethodGet, http.MethodOptions)
+
+	// Get transactions by borrower ID
+	s.router.HandleFunc(
+		"/get-transactions-by-borrower",
+		s.handleGetTransactionsByBorrowerID(),
+	).Methods(http.MethodGet, http.MethodOptions)
+
+	// Update transaction status
+	s.router.HandleFunc(
+		"/update-transaction-status",
+		s.handleUpdateTransactionStatus(),
+	).Methods(http.MethodPut, http.MethodOptions)
+
+	// Delete transaction
+	s.router.HandleFunc(
+		"/delete-transaction",
+		s.handleDeleteTransaction(),
+	).Methods(http.MethodDelete, http.MethodOptions)
+
+	// Search transactions
+	s.router.HandleFunc(
+		"/search-transactions",
+		s.handleSearchTransactions(),
+	).Methods(http.MethodPost, http.MethodOptions)
+
+	// Transaction Split
+	s.router.HandleFunc(
+		"/create-transaction-split",
+		s.CreateTransactionSplitHandler(),
+	).Methods(http.MethodPost, http.MethodOptions)
+	s.router.HandleFunc(
+		"/get-transaction-splits/{transaction_id}",
+		s.GetTransactionSplitsHandler(),
+	).Methods(http.MethodGet, http.MethodOptions)
+
 }
 func (s *Server) HandlePong() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
