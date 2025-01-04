@@ -8,7 +8,7 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/lib/pq v1.10.9
 	github.com/spf13/viper v1.19.0
-	golang.org/x/crypto v0.21.0
+	golang.org/x/crypto v0.31.0
 	golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f
 )
 
@@ -29,8 +29,8 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
-	golang.org/x/sys v0.18.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
