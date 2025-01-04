@@ -158,6 +158,27 @@ func (s *Server) RegisterRoutes() {
 		s.GetTransactionSplitsHandler(),
 	).Methods(http.MethodGet, http.MethodOptions)
 
+	// Payment Methods
+	s.router.HandleFunc(
+		"/create-payment-method",
+		s.handleCreatePaymentMethod(),
+	).Methods(http.MethodPost, http.MethodOptions)
+
+	s.router.HandleFunc(
+		"/get-payment-methods",
+		s.handleGetPaymentMethods(),
+	).Methods(http.MethodGet, http.MethodOptions)
+
+	s.router.HandleFunc(
+		"/update-payment-method",
+		s.handleUpdatePaymentMethod(),
+	).Methods(http.MethodPut, http.MethodOptions)
+
+	s.router.HandleFunc(
+		"/delete-payment-method",
+		s.handleDeletePaymentMethod(),
+	).Methods(http.MethodDelete, http.MethodOptions)
+
 }
 func (s *Server) HandlePong() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

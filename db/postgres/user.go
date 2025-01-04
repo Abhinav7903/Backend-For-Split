@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/Abhinav7903/split/factory"
@@ -93,4 +94,22 @@ func (p *Postgres) EmailExists(email string) (bool, error) {
 		return exists, fmt.Errorf("failed to check if email exists: %w", err)
 	}
 	return exists, nil
+}
+
+func (p *Postgres) GetUserIDByEmail(email string) (int, error) {
+	const query = `
+        SELECT user_id 
+        FROM users 
+        WHERE email = $1
+    `
+	var userID int
+	err := p.dbConn.QueryRow(query, email).Scan(&userID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, fmt.Errorf("user not found: %w", err)
+		}
+		return 0, fmt.Errorf("failed to get user ID: %w", err)
+	}
+
+	return userID, nil
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/Abhinav7903/split/pkg/groupmember"
 	"github.com/Abhinav7903/split/pkg/groups"
 	"github.com/Abhinav7903/split/pkg/mail"
+	"github.com/Abhinav7903/split/pkg/payment"
 	"github.com/Abhinav7903/split/pkg/sessmanager"
 	"github.com/Abhinav7903/split/pkg/transaction"
 	transactionsplit "github.com/Abhinav7903/split/pkg/transaction_split"
@@ -30,6 +31,7 @@ type Server struct {
 	group_members    groupmember.Repository
 	transaction      transaction.Repository
 	transactionsplit transactionsplit.Repository
+	payment          payment.Repository
 }
 
 type ResponseMsg struct {
@@ -82,6 +84,7 @@ func Run(envType *string) {
 		group_members:    postgres,
 		transaction:      postgres,
 		transactionsplit: postgres,
+		payment:          postgres,
 	}
 
 	server.RegisterRoutes()
@@ -106,25 +109,22 @@ func (s *Server) respond(
 	// Set content type header
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
+
+	var resp *ResponseMsg
 	if err == nil {
-		resp := &ResponseMsg{
+		resp = &ResponseMsg{
 			Message: "success",
 			Data:    data,
 		}
-
-		if err := json.NewEncoder(w).Encode(resp); err != nil {
-			s.logger.Error("Error in encoding the response", "error", err)
-			return
+	} else {
+		resp = &ResponseMsg{
+			Message: err.Error(),
+			Data:    nil, // Ensure no conflicting message structure
 		}
-		return
-	}
-	resp := &ResponseMsg{
-		Message: err.Error(),
-		Data:    data,
 	}
 
+	// Encode the response
 	if err := json.NewEncoder(w).Encode(resp); err != nil {
-		slog.Error("Error in encoding the response", "error", err)
-		return
+		s.logger.Error("Error in encoding the response", "error", err)
 	}
 }

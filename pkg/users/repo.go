@@ -12,4 +12,5 @@ type Repository interface {
 	DeleteUser(email string) error
 	GetAllUsers() ([]factory.User, error)
 	EmailExists(email string) (bool, error)
+	GetUserIDByEmail(email string) (int, error)
 }
