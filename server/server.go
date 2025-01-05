@@ -128,3 +128,4 @@ func (s *Server) respond(
 		s.logger.Error("Error in encoding the response", "error", err)
 	}
 }
+
