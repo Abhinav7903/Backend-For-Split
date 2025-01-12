@@ -179,6 +179,11 @@ func (s *Server) RegisterRoutes() {
 		s.handleDeletePaymentMethod(),
 	).Methods(http.MethodDelete, http.MethodOptions)
 
+	s.router.HandleFunc("/balance", s.handlerAddBalance()).Methods(http.MethodPost)
+	s.router.HandleFunc("/balance", s.handlerGetBalanceByID()).Methods(http.MethodGet)
+	s.router.HandleFunc("/balance", s.handlerUpdateBalance()).Methods(http.MethodPut)
+	s.router.HandleFunc("/balance", s.handlerDeleteBalance()).Methods(http.MethodDelete)
+
 }
 func (s *Server) HandlePong() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

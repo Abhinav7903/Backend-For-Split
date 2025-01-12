@@ -7,6 +7,7 @@ import (
 
 	"github.com/Abhinav7903/split/db/postgres"
 	"github.com/Abhinav7903/split/db/redis"
+	"github.com/Abhinav7903/split/pkg/balance"
 	"github.com/Abhinav7903/split/pkg/groupmember"
 	"github.com/Abhinav7903/split/pkg/groups"
 	"github.com/Abhinav7903/split/pkg/mail"
@@ -32,6 +33,7 @@ type Server struct {
 	transaction      transaction.Repository
 	transactionsplit transactionsplit.Repository
 	payment          payment.Repository
+	balance          balance.Repository
 }
 
 type ResponseMsg struct {
@@ -85,6 +87,7 @@ func Run(envType *string) {
 		transaction:      postgres,
 		transactionsplit: postgres,
 		payment:          postgres,
+		balance:          postgres,
 	}
 
 	server.RegisterRoutes()
@@ -128,4 +131,3 @@ func (s *Server) respond(
 		s.logger.Error("Error in encoding the response", "error", err)
 	}
 }
-
