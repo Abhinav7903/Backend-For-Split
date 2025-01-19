@@ -12,6 +12,7 @@ import (
 	"github.com/Abhinav7903/split/pkg/groups"
 	"github.com/Abhinav7903/split/pkg/mail"
 	"github.com/Abhinav7903/split/pkg/payment"
+	"github.com/Abhinav7903/split/pkg/request"
 	"github.com/Abhinav7903/split/pkg/sessmanager"
 	"github.com/Abhinav7903/split/pkg/transaction"
 	transactionsplit "github.com/Abhinav7903/split/pkg/transaction_split"
@@ -34,6 +35,7 @@ type Server struct {
 	transactionsplit transactionsplit.Repository
 	payment          payment.Repository
 	balance          balance.Repository
+	request          request.Repository
 }
 
 type ResponseMsg struct {
@@ -88,6 +90,7 @@ func Run(envType *string) {
 		transactionsplit: postgres,
 		payment:          postgres,
 		balance:          postgres,
+		request:          postgres,
 	}
 
 	server.RegisterRoutes()

@@ -179,10 +179,19 @@ func (s *Server) RegisterRoutes() {
 		s.handleDeletePaymentMethod(),
 	).Methods(http.MethodDelete, http.MethodOptions)
 
-	s.router.HandleFunc("/balance", s.handlerAddBalance()).Methods(http.MethodPost)
-	s.router.HandleFunc("/balance", s.handlerGetBalanceByID()).Methods(http.MethodGet)
-	s.router.HandleFunc("/balance", s.handlerUpdateBalance()).Methods(http.MethodPut)
-	s.router.HandleFunc("/balance", s.handlerDeleteBalance()).Methods(http.MethodDelete)
+	s.router.HandleFunc("/balance", s.handlerAddBalance()).Methods(http.MethodPost, http.MethodOptions)
+	s.router.HandleFunc("/balance", s.handlerGetBalanceByID()).Methods(http.MethodGet, http.MethodOptions)
+	s.router.HandleFunc("/balance", s.handlerUpdateBalance()).Methods(http.MethodPut, http.MethodOptions)
+	s.router.HandleFunc("/balance", s.handlerDeleteBalance()).Methods(http.MethodDelete, http.MethodOptions)
+
+	//Request routes
+	s.router.HandleFunc("/request", s.handleAddRequest()).Methods(http.MethodPost, http.MethodOptions)
+	s.router.HandleFunc("/request", s.handleGetRequestByID()).Methods(http.MethodGet, http.MethodOptions)
+	s.router.HandleFunc("/request", s.handleUpdateRequest()).Methods(http.MethodPut, http.MethodOptions)
+	s.router.HandleFunc("/request", s.handleDeleteRequest()).Methods(http.MethodDelete, http.MethodOptions)
+	s.router.HandleFunc("/requests-by-receiver", s.handleGetRequestsByReceiverID()).Methods(http.MethodGet, http.MethodOptions)
+	s.router.HandleFunc("/requests-by-sender", s.handleGetRequestsBySenderID()).Methods(http.MethodGet, http.MethodOptions)
+	s.router.HandleFunc("/requests-by-group", s.handleGetRequestsByGroupID()).Methods(http.MethodGet, http.MethodOptions)
 
 }
 func (s *Server) HandlePong() http.HandlerFunc {

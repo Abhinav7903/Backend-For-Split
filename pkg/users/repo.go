@@ -13,4 +13,5 @@ type Repository interface {
 	GetAllUsers() ([]factory.User, error)
 	EmailExists(email string) (bool, error)
 	GetUserIDByEmail(email string) (int, error)
+	GetUserByID(id int) (factory.User, error)
 }

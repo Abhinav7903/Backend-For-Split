@@ -113,3 +113,21 @@ func (p *Postgres) GetUserIDByEmail(email string) (int, error) {
 
 	return userID, nil
 }
+
+func (p *Postgres) GetUserByID(id int) (factory.User, error) {
+	const query = `
+		SELECT email, name, verified
+		FROM users
+		WHERE user_id = $1
+	`
+	var user factory.User
+	err := p.dbConn.QueryRow(query, id).Scan(&user.Email, &user.Name, &user.Verified)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return user, fmt.Errorf("user not found: %w", err)
+		}
+		return user, fmt.Errorf("failed to get user: %w", err)
+	}
+
+	return user, nil
+}
