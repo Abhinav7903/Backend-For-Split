@@ -82,7 +82,7 @@ func Run(envType *string) {
 		mail: mail.NewMail(
 			viper.GetString("mail_id"),
 			viper.GetString("mail_pass"),
-			viper.GetString("app-pass"),
+			viper.GetString("app_pass"),
 		),
 		group:            postgres,
 		group_members:    postgres,
