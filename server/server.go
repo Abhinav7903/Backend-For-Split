@@ -51,20 +51,21 @@ func Run(envType *string) {
 	viper.SetConfigName("json")
 
 	var level slog.Level
+	
 	if *envType == "dev" {
-		viper.SetConfigName("dev-split")
-		level = slog.LevelDebug
-	} else {
-		viper.SetConfigName("prod-split")
-		level = slog.LevelInfo
-	}
+        viper.SetConfigName("dev-split") 
+        viper.AddConfigPath(".split") // Local development config
+        level = slog.LevelDebug
+    } else {
+        viper.SetConfigName("prod-split")
+        viper.AddConfigPath("/app") // Koyeb production config
+        level = slog.LevelInfo
+    }
 
-	viper.AddConfigPath("$HOME/.split")
-	err := viper.ReadInConfig()
-	if err != nil {
-		slog.Error("Error reading config file", err)
-		return
-	}
+    if err := viper.ReadInConfig(); err != nil {
+        slog.Error("Error reading config file", "error", err)
+        return
+    }
 
 	handler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: level})
 	logger := slog.New(handler)
