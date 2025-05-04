@@ -1,7 +1,7 @@
 {
-    "mail_id":"199shreyasinghh@gmail.com",
-    "mail_pass":"Friday*@2001",
-    "app_pass":"tvde txtr errf opsy",
-    "postgresURL": "postgres://koyeb-adm:E0oP8XmCtpeS@ep-quiet-bonus-a2ddsp6z.eu-central-1.pg.koyeb.app/koyebdb"
+    "mail_id":"",
+    "mail_pass":"",
+    "app_pass":"",
+    "postgresURL": "postgres://koyeb-adm:@ep-quiet-bonus-a2ddsp6z.eu-central-1.pg.koyeb.app/koyebdb"
 }
 
