@@ -1,7 +1,7 @@
 {
-    "mail_id":"199shreyasinghh@gmail.com",
-    "mail_pass":"Friday*@2001",
-    "app_pass":"tvde txtr errf opsy",
+    "mail_id":"yourmail",
+    "mail_pass":"yourpass",
+    "app_pass":"any mail app pass",
     "postgresURL": "postgres://split:split@localhost:5432/split?sslmode=disable"
 }
 
